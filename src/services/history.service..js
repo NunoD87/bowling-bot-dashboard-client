@@ -4,7 +4,8 @@ class HistoryService {
   constructor() {
     this.api = axios.create({
       baseURL:
-        process.env.REACT_APP_SERVER_URL || "http://localhost:5005/api/history",
+        `${process.env.REACT_APP_SERVER_URL}/api/history` ||
+        "http://localhost:5005/api/history",
     });
 
     // Automatically set JWT token on the request headers for every request

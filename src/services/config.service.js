@@ -4,7 +4,8 @@ class ConfigService {
   constructor() {
     this.api = axios.create({
       baseURL:
-        process.env.REACT_APP_SERVER_URL || "http://localhost:5005/api/config",
+        `${process.env.REACT_APP_SERVER_URL}/api/config` ||
+        "http://localhost:5005/api/config",
     });
 
     // Automatically set JWT token on the request headers for every request
