@@ -10,8 +10,18 @@ export default function UserWrapper({ children }) {
   const [isLoading, setIsLoading] = useState(true);
 
   function authenticate({ user, token }) {
+    delete user.password;
     setUser(user);
     localStorage.setItem("token", token);
+  }
+
+  async function handleDiscord(code) {
+    try {
+      const { data } = await authService.handleDiscord(code);
+      authenticate(data);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   function logout() {
@@ -37,7 +47,9 @@ export default function UserWrapper({ children }) {
   if (isLoading) return <Loading />;
 
   return (
-    <UserContext.Provider value={{ user, isLoading, authenticate, logout }}>
+    <UserContext.Provider
+      value={{ user, isLoading, authenticate, handleDiscord, logout }}
+    >
       {children}
     </UserContext.Provider>
   );

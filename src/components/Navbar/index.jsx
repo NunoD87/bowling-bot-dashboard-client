@@ -1,6 +1,8 @@
 import "./styles.css";
 
-import { Link } from "react-router-dom";
+import { Avatar } from "primereact/avatar";
+import { Link, useNavigate } from "react-router-dom";
+
 import { useUser } from "../../context/user.context";
 
 function Navbar() {
@@ -8,38 +10,56 @@ function Navbar() {
   // the values from AuthContext.Provider's `value` prop
   // const { isLoggedIn, user, logOutUser } = useContext(AuthContext);
   const { user, logout } = useUser();
+  const navigate = useNavigate();
 
   return (
-    <nav>
-      <Link to='/'>
-        <button>Home</button>
-      </Link>
-
-      {user && (
-        <>
-          <button onClick={logout}>Logout</button>
-
-          <Link to='/profile'>
-            <button>Profile</button>
-            {/* <img src="https://picsum.photos/id/402/200/300" style={{ width: 50, height: 50, borderRadius: 25}} alt="profile" /> */}
-          </Link>
-
-          {/* <span>{user && user.name}</span> */}
-        </>
-      )}
-
-      {!user && (
-        <>
-          <Link to='/signup'>
-            {" "}
-            <button>Sign Up</button>{" "}
-          </Link>
-          <Link to='/login'>
-            {" "}
-            <button>Login</button>{" "}
-          </Link>
-        </>
-      )}
+    <nav className="flex fixed bg-primary">
+      <div className="ml-2">
+        <Link to={user ? "/dashboard" : "/"}>
+          <h1>Bowling Bot</h1>
+        </Link>
+      </div>
+      <div className="ml-auto my-auto">
+        <div className="flex">
+          {user && (
+            <>
+              <Avatar
+                image={
+                  user?.discord?.avatar
+                    ? user.discord.avatar
+                    : "/images/discord-default.png"
+                }
+                shape="circle"
+                className="my-auto"
+                onClick={() => {
+                  navigate("/profile");
+                }}
+              />
+              <p className="ml-3">
+                {user?.discord?.username ? user.discord.username : user.email}
+              </p>
+              <span
+                className=" ml-4 mr-3 my-auto cursor-pointer"
+                onClick={logout}
+              >
+                <i className="pi pi-sign-out logout"></i>
+              </span>
+            </>
+          )}
+          {!user && (
+            <>
+              <span
+                className="mr-3 my-auto cursor-pointer"
+                onClick={() => {
+                  navigate("/login");
+                }}
+              >
+                <i className="pi pi-sign-in logout"></i>
+              </span>
+            </>
+          )}
+        </div>
+      </div>
     </nav>
   );
 }

@@ -1,19 +1,21 @@
 import "./styles.css";
 
+import { Button } from "primereact/button";
+import { InputText } from "primereact/inputtext";
+import { Password } from "primereact/password";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import authService from "../../services/auth.service";
-import { useState } from "react";
+import { useToasts } from "../../context/toasts.context";
 import { useUser } from "../../context/user.context";
+import authService from "../../services/auth.service";
+import { ToastSeverity } from "../../utils/enums";
 
 function LoginPage() {
-  const [form, setForm] = useState({ email: "", password: "" });
-
-  const [errorMessage, setErrorMessage] = useState(undefined);
-
-  const navigate = useNavigate();
-
+  const { showToast } = useToasts();
   const { authenticate } = useUser();
+  const [form, setForm] = useState({ email: "", password: "" });
+  const navigate = useNavigate();
 
   const handleChanges = (e) => {
     const { name, value } = e.target;
@@ -24,39 +26,59 @@ function LoginPage() {
     e.preventDefault();
 
     try {
-      const result = await authService.login(form);
-      authenticate(result.data);
-      navigate("/");
+      const { data } = await authService.login(form);
+      authenticate(data);
+      showToast({
+        severity: ToastSeverity.Success,
+        summary: "Login successful",
+        detail: "You have been logged in successfully.",
+        life: 1000,
+      });
+      navigate("/dashboard");
     } catch (error) {
       const errorDescription = error.response.data.message;
-      setErrorMessage(errorDescription);
+      showToast({
+        severity: ToastSeverity.Error,
+        summary: "Error",
+        detail: errorDescription,
+        life: 2000,
+      });
     }
   };
 
   return (
-    <div className='LoginPage'>
+    <div className="flex flex-column align-items-center w-screen mt-7">
       <h1>Login</h1>
 
       <form onSubmit={handleSubmission}>
-        <label>Email:</label>
-        <input
-          type='email'
-          name='email'
-          value={form.email}
-          onChange={handleChanges}
-        />
+        <div className="my-3">
+          <label>
+            <h4 className="m-0">Email</h4>
+            <InputText
+              name="email"
+              value={form.email}
+              keyfilter="email"
+              onChange={handleChanges}
+              className="pr-5"
+            />
+          </label>
+        </div>
 
-        <label>Password:</label>
-        <input
-          type='password'
-          name='password'
-          value={form.password}
-          onChange={handleChanges}
-        />
+        <div className="my-3">
+          <label>
+            <h4 className="m-0">Password</h4>
+            <Password
+              name="password"
+              value={form.password}
+              onChange={handleChanges}
+              toggleMask
+              feedback={false}
+            />
+          </label>
+        </div>
 
-        <button type='submit'>Login</button>
+        <Button label="Login" className="p-button-sm" />
       </form>
-      {errorMessage && <p className='error-message'>{errorMessage}</p>}
 
       <p>Don't have an account yet?</p>
       <Link to={"/signup"}> Sign Up</Link>

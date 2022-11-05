@@ -1,0 +1,14 @@
+.p-inputswitch.options-switch {
+  height: 1.1rem;
+  width: 2.1rem;
+}
+
+.options-switch .p-inputswitch-slider:before {
+  height: 0.9rem;
+  width: 0.9rem;
+  margin-top: -0.45rem;
+
+}
+.p-inputswitch.p-inputswitch-checked.options-switch .p-inputswitch-slider:before {
+  transform: translateX(0.7rem);
+}

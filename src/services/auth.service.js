@@ -27,6 +27,14 @@ class AuthService {
   verify = () => {
     return this.api.get("/auth/verify");
   };
+
+  deleteAccount = () => {
+    return this.api.get("/auth/delete");
+  };
+
+  handleDiscord = (code) => {
+    return this.api.post("/auth/discord", { code });
+  };
 }
 
 const authService = new AuthService();
