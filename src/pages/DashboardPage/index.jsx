@@ -19,7 +19,7 @@ function DashboardPage() {
           <a
             href={`https://discord.com/api/oauth2/authorize?client_id=1033309123577647144&redirect_uri=${
               process.env.REACT_APP_SERVER_URL
-                ? "https%3A%2F%2bowling-bot.nunodaniel.com%2discord"
+                ? "https%3A%2F%2Fbowling-bot.nunodaniel.com%2Fdiscord"
                 : "http%3A%2F%2Flocalhost%3A3000%2Fdiscord"
             }&response_type=code&scope=identify%20guilds%20guilds.members.read`}
           >
