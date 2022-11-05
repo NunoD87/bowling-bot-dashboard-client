@@ -1,0 +1,16 @@
+nav {
+  min-width: 100%;
+}
+
+i.logout:hover {
+  animation: logout 500ms;
+}
+
+@keyframes logout {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
