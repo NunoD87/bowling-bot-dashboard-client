@@ -4,7 +4,8 @@ class GuildsService {
   constructor() {
     this.api = axios.create({
       baseURL:
-        process.env.REACT_APP_SERVER_URL || "http://localhost:5005/api/guild",
+        `${process.env.REACT_APP_SERVER_URL}/api/guild` ||
+        "http://localhost:5005/api/guild",
     });
 
     // Automatically set JWT token on the request headers for every request
