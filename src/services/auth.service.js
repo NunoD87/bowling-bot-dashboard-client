@@ -1,40 +1,49 @@
 import axios from "axios";
-
 class AuthService {
   constructor() {
     this.api = axios.create({
-      baseURL: process.env.REACT_APP_SERVER_URL || "http://localhost:5005",
+      baseURL: `${process.env.REACT_APP_API_URL}/auth`,
     });
 
     // Automatically set JWT token on the request headers for every request
     this.api.interceptors.request.use((config) => {
-      const token = localStorage.getItem("token");
-
-      if (token) config.headers = { Authorization: `Bearer ${token}` };
-
-      return config;
+      return this.setAuthorization(config);
     });
   }
 
-  login = (requestBody) => {
-    return this.api.post("/auth/login", requestBody);
-  };
+  setAuthorization(config) {
+    const token = localStorage.getItem("token");
+    if (token) config.headers = { Authorization: `Bearer ${token}` };
+    return config;
+  }
 
-  signup = (requestBody) => {
-    return this.api.post("/auth/signup", requestBody);
-  };
+  login(credentials) {
+    return this.api.post("/login", credentials);
+  }
 
-  verify = () => {
-    return this.api.get("/auth/verify");
-  };
+  signup(data) {
+    return this.api.post("/signup", data);
+  }
 
-  deleteAccount = () => {
-    return this.api.get("/auth/delete");
-  };
+  verify() {
+    return this.api.get("/verify");
+  }
 
-  handleDiscord = (code) => {
-    return this.api.post("/auth/discord", { code });
-  };
+  editAccount(data) {
+    return this.api.post("/edit", data);
+  }
+
+  deleteAccount() {
+    return this.api.delete("/delete");
+  }
+
+  connectDiscord(code) {
+    return this.api.post("/discord", { code });
+  }
+
+  disconnectDiscord() {
+    return this.api.delete("/discord");
+  }
 }
 
 const authService = new AuthService();

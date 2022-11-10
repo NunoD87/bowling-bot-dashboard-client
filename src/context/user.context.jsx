@@ -17,10 +17,11 @@ export default function UserWrapper({ children }) {
 
   async function handleDiscord(code) {
     try {
-      const { data } = await authService.handleDiscord(code);
-      authenticate(data);
+      const { data } = await authService.connectDiscord(code);
+      if (!data.guildId) authenticate(data);
+      return data;
     } catch (error) {
-      console.error(error);
+      return error;
     }
   }
 

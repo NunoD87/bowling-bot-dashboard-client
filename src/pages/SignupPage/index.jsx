@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 
 import { useToasts } from "../../context/toasts.context";
 import authService from "../../services/auth.service";
-import { ToastSeverity } from "../../utils/enums";
+import { ToastLife, ToastSeverity } from "../../utils/enums";
 
 function SignupPage() {
   const { showToast } = useToasts();
@@ -45,13 +45,19 @@ function SignupPage() {
     try {
       await authService.signup(form);
       navigate("/login");
+      showToast({
+        severity: ToastSeverity.Success,
+        summary: "Account created",
+        detail: "Account created successfully.",
+        life: ToastLife.Success,
+      });
     } catch (error) {
       const errorDescription = error.response.data.message;
       showToast({
         severity: ToastSeverity.Error,
         summary: "Error",
         detail: errorDescription,
-        life: 2000,
+        life: ToastLife.Error,
       });
     }
   };

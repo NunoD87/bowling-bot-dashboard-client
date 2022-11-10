@@ -2,68 +2,72 @@ import "./styles.css";
 
 import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
+import { Dropdown } from "primereact/dropdown";
 import { InputSwitch } from "primereact/inputswitch";
 import { InputTextarea } from "primereact/inputtextarea";
+import { MultiSelect } from "primereact/multiselect";
 import { Skeleton } from "primereact/skeleton";
-import { React, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { React, useCallback, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 import GuildsSide from "../../components/GuildsSide";
 import { useGuilds } from "../../context/guilds.context";
 import { useToasts } from "../../context/toasts.context";
 import configService from "../../services/config.service";
-import historyService from "../../services/history.service.";
-import { ToastSeverity } from "../../utils/enums";
-import NotFoundPage from "../NotFoundPage";
+import { fetchGuildData } from "../../utils";
+import { ToastLife, ToastSeverity } from "../../utils/enums";
 
 function GuildPage() {
   const { guildId } = useParams();
   const { isLoading, getGuild } = useGuilds();
   const { showToast } = useToasts();
+  const navigate = useNavigate();
 
   const guild = getGuild(guildId);
+
+  const [guildData, setGuildData] = useState(guild);
   const [history, setHistory] = useState(undefined);
   const [form, setForm] = useState(undefined);
   const [save, setSave] = useState(false);
 
+  const fetchGuild = useCallback(async () => {
+    const data = await fetchGuildData(guildId, guild);
+    setGuildData(data);
+  }, [guild, guildId]);
+
+  const fetchConfig = useCallback(async () => {
+    const { data: config } = await configService.getConfig(guildId);
+    setForm({
+      enabled: config?.enabled || false,
+      ephemeral: config?.ephemeral || false,
+      allowedChannels: config?.allowedChannels || [],
+      allowedRoles: config?.allowedRoles || [],
+      adminChannel: config?.adminChannel || "",
+      spareMessage: config?.spareMessage || "",
+      spareMessageEnabled: config?.spareMessageEnabled || false,
+      strikeMessage: config?.strikeMessage || "",
+      strikeMessageEnabled: config?.strikeMessageEnabled || false,
+    });
+  }, [guildId]);
+
+  const fetchHistory = useCallback(async () => {
+    const { data: history } = await configService.getHistory(guildId);
+    setHistory(history);
+  }, [guildId]);
+
   useEffect(() => {
-    const fetchConfig = async () => {
-      try {
-        const { data: config } = await configService.getConfig(guildId);
-        setForm({
-          enabled: config?.enabled || false,
-          ephemeral: config?.ephemeral || false,
-          spareMessage: config?.spareMessage || "",
-          spareMessageEnabled: config?.spareMessageEnabled || false,
-          strikeMessage: config?.strikeMessage || "",
-          strikeMessageEnabled: config?.strikeMessageEnabled || false,
-        });
-      } catch (error) {
-        setForm({
-          enabled: false,
-          ephemeral: false,
-          spareMessage: "",
-          spareMessageEnabled: false,
-          strikeMessage: "",
-          strikeMessageEnabled: false,
-        });
-      }
-    };
-
-    const fetchHistory = async () => {
-      const { data: history } = await historyService.getHistory(guildId);
-      setHistory(history);
-      console.log(history);
-    };
-
+    if (!guild) navigate("/dashboard", { replace: true });
+    fetchGuild();
     fetchConfig();
     fetchHistory();
     setSave(false);
-  }, [guildId]);
+  }, [fetchConfig, fetchGuild, fetchHistory, guild, navigate]);
 
   function handleChanges(e) {
     const { name, value } = e.target;
+
     setForm({ ...form, [name]: value });
+
     if (save === false) setSave(true);
   }
 
@@ -73,13 +77,13 @@ function GuildPage() {
     try {
       configService.setConfig(guildId, form);
       setSave(false);
-      const { data: history } = await historyService.getHistory(guildId);
+      const { data: history } = await configService.getHistory(guildId);
       setHistory(history);
       showToast({
         severity: ToastSeverity.Success,
         summary: "Config updated",
         detail: "You updated the config successfully.",
-        life: 2000,
+        life: ToastLife.Success,
       });
     } catch (error) {
       const errorDescription = error.response.data.message;
@@ -87,7 +91,7 @@ function GuildPage() {
         severity: ToastSeverity.Error,
         summary: "Error",
         detail: errorDescription,
-        life: 2000,
+        life: ToastLife.Error,
       });
     }
   }
@@ -114,11 +118,15 @@ function GuildPage() {
     );
   }
 
-  if (!guild) {
+  if (!guild?.isBotIn) {
     return (
       <>
         <GuildsSide />
-        <NotFoundPage />
+        <div className="flex w-screen h-16rem ml-8 mt-7">
+          <div className="m-auto">
+            <p className="text-5xl">Invite</p>
+          </div>
+        </div>
       </>
     );
   }
@@ -147,37 +155,8 @@ function GuildPage() {
             />
           </div>
         </div>
-        <div
-          className="border-round-md p-4 mt-2 mr-4"
-          style={{ backgroundColor: "var(--gray-800)" }}
-        >
-          <h4 className="m-0">Configuration</h4>
-          <div className="flex flex-wrap">
-            <div className="flex flex-column w-1/2">
-              <div>
-                <div className="flex">
-                  <h5>Spare Message</h5>
-                  <InputSwitch
-                    name="spareMessageEnabled"
-                    value={form.spareMessageEnabled}
-                    checked={form.spareMessageEnabled}
-                    onChange={handleChanges}
-                    className="ml-auto my-auto options-switch"
-                    disabled={!form.enabled}
-                  />
-                </div>
-                <InputTextarea
-                  name="spareMessage"
-                  value={form.spareMessage}
-                  onChange={handleChanges}
-                  cols={40}
-                  autoResize
-                  disabled={!form.enabled || !form.spareMessageEnabled}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
+
+        {/* Messages Div */}
         <div
           className="border-round-md p-4 mt-2 mr-4"
           style={{ backgroundColor: "var(--gray-800)" }}
@@ -243,6 +222,76 @@ function GuildPage() {
             </div>
           </div>
         </div>
+
+        {/* Channels Div */}
+        <div
+          className="border-round-md p-4 mt-2 mr-4"
+          style={{ backgroundColor: "var(--gray-800)" }}
+        >
+          <h4 className="m-0">Channels</h4>
+          <div className="flex flex-wrap">
+            <div className="flex flex-column w-1/2">
+              <div>
+                <h5>Playable Channels</h5>
+                <MultiSelect
+                  name="allowedChannels"
+                  value={form.allowedChannels}
+                  onChange={handleChanges}
+                  options={guildData.channels}
+                  optionLabel="name"
+                  optionValue="id"
+                  placeholder="Select Channels"
+                  filter
+                  disabled={!form.enabled}
+                />
+              </div>
+              <div>
+                <h5>Admin Channel</h5>
+                <Dropdown
+                  name="adminChannel"
+                  value={form.adminChannel}
+                  onChange={handleChanges}
+                  options={guildData.channels}
+                  optionLabel="name"
+                  optionValue="id"
+                  placeholder="Select Channel"
+                  filter
+                  disabled={!form.enabled}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Roles Div */}
+
+        <div
+          className="border-round-md p-4 mt-2 mr-4"
+          style={{ backgroundColor: "var(--gray-800)" }}
+        >
+          <h4 className="m-0">Roles</h4>
+          <div className="flex flex-wrap">
+            <div className="flex flex-column w-1/2">
+              <div>
+                <h5>Allowed Roles</h5>
+                <MultiSelect
+                  name="allowedRoles"
+                  value={form.allowedRoles}
+                  onChange={handleChanges}
+                  options={guildData.roles}
+                  optionLabel="name"
+                  optionValue="id"
+                  placeholder="Select Roles"
+                  filter
+                  disabled={!form.enabled}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Button Div */}
+
         <div className="flex w-full mt-8 mb-4">
           <Button
             label="Save"
@@ -251,14 +300,17 @@ function GuildPage() {
             disabled={!save}
           />
         </div>
+
+        {/* History Div */}
         {history && (
-          <div className="flex w-full my-8">
+          <div className="my-8">
             <h4 className="m-0">History</h4>
             <div className="flex flex-wrap w-full">
               {history.map((h) => (
                 <div
                   className="border-round-md p-4 mt-2 mr-4"
                   style={{ backgroundColor: "var(--gray-800)" }}
+                  key={h._id}
                 >
                   <div className="flex">
                     <h5 className="m-0">{h.actions}</h5>

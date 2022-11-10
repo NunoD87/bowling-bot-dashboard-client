@@ -1,19 +1,18 @@
 import "./App.css";
 
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 
+import Loading from "./components/Loading";
+import Navbar from "./components/Navbar";
+import { useUser } from "./context/user.context";
 import DashboardPage from "./pages/DashboardPage";
 import GuildPage from "./pages/GuildPage";
-import HandleDiscord from "./utils/HandleDiscord";
 import HomePage from "./pages/HomePage";
-import Loading from "./components/Loading";
 import LoginPage from "./pages/LoginPage";
-import Navbar from "./components/Navbar";
-import { Navigate } from "react-router-dom";
 import NotFoundPage from "./pages/NotFoundPage";
 import ProfilePage from "./pages/ProfilePage";
 import SignupPage from "./pages/SignupPage";
-import { useUser } from "./context/user.context";
+import HandleDiscord from "./utils/HandleDiscord";
 
 function App() {
   const { user, isLoading } = useUser();

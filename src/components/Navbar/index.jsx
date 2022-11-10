@@ -13,7 +13,7 @@ function Navbar() {
   const navigate = useNavigate();
 
   return (
-    <nav className="flex fixed bg-primary">
+    <nav className="flex fixed bg-primary" style={{ zIndex: 1100 }}>
       <div className="ml-2">
         <Link to={user ? "/dashboard" : "/"}>
           <h1>Bowling Bot</h1>

@@ -1,16 +1,18 @@
-import { Skeleton } from "primereact/skeleton";
-import { Link } from "react-router-dom";
 import "./styles.css";
+
+import { Avatar } from "primereact/avatar";
+import { Skeleton } from "primereact/skeleton";
+import { Tooltip } from "primereact/tooltip";
+import { Link } from "react-router-dom";
+
 import { useGuilds } from "../../context/guilds.context";
 import { useUser } from "../../context/user.context";
-import { Avatar } from "primereact/avatar";
-import { Tooltip } from "primereact/tooltip";
 
 function GuildsSide() {
   const { user } = useUser();
   const { guilds, isLoading } = useGuilds();
 
-  if (isLoading) {
+  if (isLoading || !guilds) {
     const skeletonGuilds = [];
 
     for (let i = 0; i < 20; i++) {
@@ -58,7 +60,11 @@ function GuildsSide() {
                     }
                     shape="circle"
                     size="large"
-                    className={`hoverG avatar-${guild.id}`}
+                    className={
+                      !guild.isBotIn
+                        ? `bw hoverG avatar-${guild.id}`
+                        : `hoverG avatar-${guild.id}`
+                    }
                   />
                 </Link>
               </li>

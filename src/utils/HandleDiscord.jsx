@@ -1,9 +1,10 @@
+import { AxiosError } from "axios";
 import { React, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { useToasts } from "../context/toasts.context";
 import { useUser } from "../context/user.context";
-import { ToastSeverity } from "./enums";
+import { ToastLife, ToastSeverity } from "./enums";
 
 function HandleDiscord() {
   const { showToast } = useToasts();
@@ -14,26 +15,31 @@ function HandleDiscord() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!code) navigate("/");
+    const connectDiscord = async () => {
+      if (!code) navigate("/", { replace: true });
+      const data = await handleDiscord(code);
+      showToast({
+        severity: `${
+          data instanceof AxiosError
+            ? ToastSeverity.Error
+            : ToastSeverity.Success
+        }`,
+        summary: `${
+          data instanceof AxiosError ? "Error" : "Discord connected"
+        }`,
+        detail: `${
+          data instanceof AxiosError
+            ? data.response.data.message
+            : data.data.message
+        }`,
+        life: `${
+          data instanceof AxiosError ? ToastLife.Error : ToastLife.Success
+        }`,
+      });
+      navigate("/dashboard", { replace: true });
+    };
 
-    try {
-      handleDiscord(code);
-      navigate("/dashboard");
-      showToast({
-        severity: ToastSeverity.Success,
-        summary: "Discord connected successfully",
-        detail: "You connected your Discord successfully.",
-        life: 2000,
-      });
-    } catch (error) {
-      navigate("/dashboard");
-      showToast({
-        severity: ToastSeverity.Error,
-        summary: "Error",
-        detail: "An error occurred while connecting your Discord.",
-        life: 2000,
-      });
-    }
+    connectDiscord();
   }, [code, handleDiscord, navigate, showToast]);
 
   return <></>;

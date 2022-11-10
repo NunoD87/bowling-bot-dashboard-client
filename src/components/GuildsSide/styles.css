@@ -1,3 +1,7 @@
+.bw {
+  filter: grayscale(100%);
+}
+
 div.discord::-webkit-scrollbar {
   display: none;
 }

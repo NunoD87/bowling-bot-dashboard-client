@@ -9,7 +9,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useToasts } from "../../context/toasts.context";
 import { useUser } from "../../context/user.context";
 import authService from "../../services/auth.service";
-import { ToastSeverity } from "../../utils/enums";
+import { ToastLife, ToastSeverity } from "../../utils/enums";
 
 function LoginPage() {
   const { showToast } = useToasts();
@@ -32,7 +32,7 @@ function LoginPage() {
         severity: ToastSeverity.Success,
         summary: "Login successful",
         detail: "You have been logged in successfully.",
-        life: 1000,
+        life: ToastLife.Success,
       });
       navigate("/dashboard");
     } catch (error) {
@@ -41,7 +41,7 @@ function LoginPage() {
         severity: ToastSeverity.Error,
         summary: "Error",
         detail: errorDescription,
-        life: 2000,
+        life: ToastLife.Error,
       });
     }
   };

@@ -12,7 +12,6 @@ export default function GuildsWrapper({ children }) {
 
   function getGuild(guildId) {
     if (!guilds) return undefined;
-
     return guilds.find((guild) => guild.id === guildId);
   }
 
