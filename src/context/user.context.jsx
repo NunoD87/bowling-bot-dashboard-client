@@ -18,7 +18,7 @@ export default function UserWrapper({ children }) {
   async function handleDiscord(code) {
     try {
       const { data } = await authService.connectDiscord(code);
-      if (!data.guildId) authenticate(data);
+      authenticate(data);
       return data;
     } catch (error) {
       return error;
