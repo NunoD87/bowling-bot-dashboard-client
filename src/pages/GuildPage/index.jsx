@@ -2,6 +2,8 @@ import "./styles.css";
 
 import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
+import { Column } from "primereact/column";
+import { DataTable } from "primereact/datatable";
 import { Dropdown } from "primereact/dropdown";
 import { InputSwitch } from "primereact/inputswitch";
 import { InputTextarea } from "primereact/inputtextarea";
@@ -68,9 +70,7 @@ function GuildPage() {
 
   function handleChanges(e) {
     const { name, value } = e.target;
-
     setForm({ ...form, [name]: value });
-
     if (save === false) setSave(true);
   }
 
@@ -80,8 +80,9 @@ function GuildPage() {
     try {
       configService.setConfig(guildId, form);
       setSave(false);
-      const { data: history } = await configService.getHistory(guildId);
-      setHistory(history);
+      /* const { data: history } = await configService.getHistory(guildId);
+      setHistory(history); */
+      fetchHistory();
       showToast({
         severity: ToastSeverity.Success,
         summary: "Config updated",
@@ -159,7 +160,7 @@ function GuildPage() {
             <div className="flex flex-column w-1/2">
               <div>
                 <div className="flex">
-                  <h5>Ephemeral Messages</h5>
+                  <h5>Private Messages</h5>
                   <InputSwitch
                     name="ephemeral"
                     value={form.ephemeral}
@@ -172,7 +173,7 @@ function GuildPage() {
               </div>
               <div>
                 <div className="flex">
-                  <h5>Spare Message</h5>
+                  <h5>Custom Spare Message</h5>
                   <InputSwitch
                     name="spareMessageEnabled"
                     value={form.spareMessageEnabled}
@@ -193,7 +194,7 @@ function GuildPage() {
               </div>
               <div>
                 <div className="flex">
-                  <h5>Strike Message</h5>
+                  <h5>Custom Strike Message</h5>
                   <InputSwitch
                     name="strikeMessageEnabled"
                     value={form.strikeMessageEnabled}
@@ -296,26 +297,17 @@ function GuildPage() {
 
         {/* History Div */}
         {history && (
-          <div className="my-8">
-            <h4 className="m-0">History</h4>
-            <div className="flex flex-wrap w-full">
-              {history.map((h) => (
-                <div
-                  className="border-round-md p-4 mt-2 mr-4"
-                  style={{ backgroundColor: "var(--gray-800)" }}
-                  key={h._id}
-                >
-                  <div className="flex">
-                    <h5 className="m-0">{h.actions}</h5>
-                    <h5 className="m-0 ml-auto">{h.createdAt}</h5>
-                  </div>
-                  <div className="flex">
-                    <h5 className="m-0">User</h5>
-                    <h5 className="m-0 ml-auto">Reason</h5>
-                  </div>
-                </div>
-              ))}
-            </div>
+          <div className="my-8 ml-4">
+            <h3 className="m-0">History</h3>
+            <DataTable
+              value={history}
+              responsiveLayout="scroll"
+              className="mt-4"
+            >
+              <Column field="createdAt" header="Date"></Column>
+              <Column field="actions" header="Actions"></Column>
+              <Column field="username" header="User"></Column>
+            </DataTable>
           </div>
         )}
       </form>
