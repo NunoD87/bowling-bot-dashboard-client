@@ -9,18 +9,23 @@ function HandleDiscord() {
   const { handleDiscord } = useUser();
   const [searchParams] = useSearchParams();
   const code = searchParams.get("code");
+  const guildId = searchParams.get("guild_id");
 
   const navigate = useNavigate();
 
   useEffect(() => {
     const connectDiscord = async () => {
       if (!code) navigate("/", { replace: true });
-      await handleDiscord(code);
-      navigate("/dashboard", { replace: true });
+      const data = await handleDiscord(code, guildId);
+      if (data.guildId) {
+        navigate(`/guild/${data.guildId}`, { replace: true });
+      } else {
+        navigate("/dashboard", { replace: true });
+      }
     };
 
     connectDiscord();
-  }, [code, handleDiscord, navigate, showToast]);
+  }, [code, guildId, handleDiscord, navigate, showToast]);
 
   return <></>;
 }

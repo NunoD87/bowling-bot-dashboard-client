@@ -37,8 +37,8 @@ class AuthService {
     return this.api.delete("/delete");
   }
 
-  connectDiscord(code) {
-    return this.api.post("/discord", { code });
+  connectDiscord(code, guildId) {
+    return this.api.post("/discord", { code, guildId });
   }
 
   disconnectDiscord() {

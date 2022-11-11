@@ -25,14 +25,18 @@ function GuildPage() {
 
   const guild = getGuild(guildId);
 
+  const [isLoadingData, setIsLoadingData] = useState(false);
+
   const [guildData, setGuildData] = useState(guild);
   const [history, setHistory] = useState(undefined);
   const [form, setForm] = useState(undefined);
   const [save, setSave] = useState(false);
 
   const fetchGuild = useCallback(async () => {
+    setIsLoadingData(true);
     const data = await fetchGuildData(guildId, guild);
     setGuildData(data);
+    setIsLoadingData(false);
   }, [guild, guildId]);
 
   const fetchConfig = useCallback(async () => {
@@ -56,7 +60,6 @@ function GuildPage() {
   }, [guildId]);
 
   useEffect(() => {
-    if (!guild) navigate("/dashboard", { replace: true });
     fetchGuild();
     fetchConfig();
     fetchHistory();
@@ -96,7 +99,7 @@ function GuildPage() {
     }
   }
 
-  if (isLoading || !form) {
+  if (isLoading || !form || isLoadingData) {
     return (
       <>
         <GuildsSide />
@@ -118,18 +121,8 @@ function GuildPage() {
     );
   }
 
-  if (!guild?.isBotIn) {
-    return (
-      <>
-        <GuildsSide />
-        <div className="flex w-screen h-16rem ml-8 mt-7">
-          <div className="m-auto">
-            <p className="text-5xl">Invite</p>
-          </div>
-        </div>
-      </>
-    );
-  }
+  if (!isLoading && !isLoadingData && !guildData && !guild)
+    navigate("/dashboard", { replace: true });
 
   return (
     <>
@@ -237,7 +230,7 @@ function GuildPage() {
                   name="allowedChannels"
                   value={form.allowedChannels}
                   onChange={handleChanges}
-                  options={guildData.channels}
+                  options={guildData?.channels}
                   optionLabel="name"
                   optionValue="id"
                   placeholder="Select Channels"
@@ -251,7 +244,7 @@ function GuildPage() {
                   name="adminChannel"
                   value={form.adminChannel}
                   onChange={handleChanges}
-                  options={guildData.channels}
+                  options={guildData?.channels}
                   optionLabel="name"
                   optionValue="id"
                   placeholder="Select Channel"
@@ -278,7 +271,7 @@ function GuildPage() {
                   name="allowedRoles"
                   value={form.allowedRoles}
                   onChange={handleChanges}
-                  options={guildData.roles}
+                  options={guildData?.roles}
                   optionLabel="name"
                   optionValue="id"
                   placeholder="Select Roles"

@@ -15,9 +15,11 @@ export default function UserWrapper({ children }) {
     localStorage.setItem("token", token);
   }
 
-  async function handleDiscord(code) {
+  async function handleDiscord(code, guildId) {
     try {
-      const { data } = await authService.connectDiscord(code);
+      const { data } = await authService.connectDiscord(code, guildId);
+      console.log(data);
+      if (data.guildId) return data;
       authenticate(data);
       return data;
     } catch (error) {

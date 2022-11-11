@@ -3,7 +3,7 @@ import "./styles.css";
 import { Avatar } from "primereact/avatar";
 import { Skeleton } from "primereact/skeleton";
 import { Tooltip } from "primereact/tooltip";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { useGuilds } from "../../context/guilds.context";
 import { useUser } from "../../context/user.context";
@@ -11,6 +11,7 @@ import { useUser } from "../../context/user.context";
 function GuildsSide() {
   const { user } = useUser();
   const { guilds, isLoading } = useGuilds();
+  const navigate = useNavigate();
 
   if (isLoading || !guilds) {
     const skeletonGuilds = [];
@@ -53,20 +54,31 @@ function GuildsSide() {
               >
                 <Tooltip target={`.avatar-${guild.id}`} content={guild.name} />
 
-                <Link to={`/guild/${guild.id}`}>
-                  <Avatar
-                    image={
-                      guild.icon ? guild.icon : "/images/discord-default.png"
+                <Avatar
+                  image={
+                    guild.icon ? guild.icon : "/images/discord-default.png"
+                  }
+                  shape="circle"
+                  size="large"
+                  className={
+                    !guild.isBotIn
+                      ? `bw hoverG avatar-${guild.id}`
+                      : `hoverG avatar-${guild.id}`
+                  }
+                  onClick={() => {
+                    if (!guild.isBotIn) {
+                      window.location.href = `https://discord.com/oauth2/authorize?client_id=1033309123577647144&scope=bot%20applications.commands&guild_id=${
+                        guild.id
+                      }&redirect_uri=${
+                        process.env.REACT_APP_DEV
+                          ? "http%3A%2F%2Flocalhost%3A3000%2Fdiscord"
+                          : "https%3A%2F%2Fbowling-bot.nunodaniel.com%2Fdiscord"
+                      }&permissions=8&disable_guild_select=true&response_type=code`;
                     }
-                    shape="circle"
-                    size="large"
-                    className={
-                      !guild.isBotIn
-                        ? `bw hoverG avatar-${guild.id}`
-                        : `hoverG avatar-${guild.id}`
-                    }
-                  />
-                </Link>
+
+                    navigate(`/guild/${guild.id}`);
+                  }}
+                />
               </li>
             ))}
           </ul>

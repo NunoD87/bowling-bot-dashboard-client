@@ -225,12 +225,6 @@ function ProfilePage() {
             {`${user.discord.username}#${user.discord.discriminator} (${user.discord.id})`}
           </p>
         )}
-        <div>
-          <Button className="discord p-0" aria-label="Discord">
-            <i className="pi pi-discord px-2"></i>
-            <span className="px-3">Discord</span>
-          </Button>
-        </div>
       </div>
     </>
   );

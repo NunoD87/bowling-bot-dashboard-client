@@ -34,6 +34,7 @@ function App() {
             element={
               user ? <DashboardPage /> : <Navigate to="/login" replace />
             }
+            disableScrollToTop
           />
 
           <Route
@@ -45,6 +46,7 @@ function App() {
                 <Navigate to="/dashboard" replace />
               )
             }
+            disableScrollToTop
           />
 
           <Route
