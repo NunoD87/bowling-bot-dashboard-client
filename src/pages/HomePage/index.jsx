@@ -1,11 +1,10 @@
 import "./styles.css";
 
+import { useNavigate } from "react-router-dom";
+
 function HomePage() {
-  return (
-    <div>
-      <h1>Home page</h1>
-    </div>
-  );
+  const navigate = useNavigate();
+  return navigate("/login");
 }
 
 export default HomePage;
