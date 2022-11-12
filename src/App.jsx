@@ -7,7 +7,6 @@ import Navbar from "./components/Navbar";
 import { useUser } from "./context/user.context";
 import DashboardPage from "./pages/DashboardPage";
 import GuildPage from "./pages/GuildPage";
-import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ProfilePage from "./pages/ProfilePage";
@@ -25,7 +24,7 @@ function App() {
 
       <div className="flex w-auto">
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<Navigate to="/login" replace />} />
 
           <Route path="/discord" element={<HandleDiscord />} />
 
